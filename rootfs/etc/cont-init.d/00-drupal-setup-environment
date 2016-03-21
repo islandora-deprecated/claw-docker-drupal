@@ -1,0 +1,47 @@
+#!/usr/bin/execlineb -P
+# -*- mode: sh -*-
+# vi: set ft=sh:
+with-contenv
+# Import defaults from linked container.
+multisubstitute
+{
+  # User can override linked container settings,
+  # otherwise it will default to the linked container.
+  import -D "mysql" MYSQL_HOST
+  import -D "3306" MYSQL_HOST_PORT
+  import -i MYSQL_ROOT_PASSWORD
+  # Set defaults for Drupal environment.
+  import -D "standard" DRUPAL_SITE_INSTALL_PROFILE
+  import -D "Islandora CLAW" DRUPAL_SITE_NAME
+  import -D "webmaster@localhost.com" DRUPAL_SITE_EMAIL
+  import -D "en-us" DRUPAL_SITE_LOCALE
+  import -D "admin" DRUPAL_SITE_ACCOUNT_NAME
+  import -i DRUPAL_SITE_ACCOUNT_PASSWORD
+  import -D "webmaster@localhost.com" DRUPAL_SITE_ACCOUNT_EMAIL
+  import -D "drupal_default" DRUPAL_SITE_DB_NAME
+  import -D "drupal" DRUPAL_SITE_DB_USER
+  import -i DRUPAL_SITE_DB_PASSWORD
+  import -D "no" DRUPAL_SITE_DB_REPLACE_EXISTING
+}
+foreground {
+    # We add / update the environment defined for the container,
+    # this allows our other initialization and service scripts
+    # use these settings; but does not change the existing
+    # enviroment as seen by linked containers.
+    s6-env -i
+    MYSQL_HOST=$MYSQL_HOST
+    MYSQL_HOST_PORT=$MYSQL_HOST_PORT
+    MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+    DRUPAL_SITE_INSTALL_PROFILE=$DRUPAL_SITE_INSTALL_PROFILE
+    DRUPAL_SITE_NAME=$DRUPAL_SITE_NAME
+    DRUPAL_SITE_EMAIL=$DRUPAL_SITE_EMAIL
+    DRUPAL_SITE_LOCALE=$DRUPAL_SITE_LOCALE
+    DRUPAL_SITE_ACCOUNT_NAME=$DRUPAL_SITE_ACCOUNT_NAME
+    DRUPAL_SITE_ACCOUNT_PASSWORD=$DRUPAL_SITE_ACCOUNT_PASSWORD
+    DRUPAL_SITE_ACCOUNT_EMAIL=$DRUPAL_SITE_ACCOUNT_EMAIL
+    DRUPAL_SITE_DB_NAME=$DRUPAL_SITE_DB_NAME
+    DRUPAL_SITE_DB_USER=$DRUPAL_SITE_DB_USER
+    DRUPAL_SITE_DB_PASSWORD=$DRUPAL_SITE_DB_PASSWORD
+    DRUPAL_SITE_DB_REPLACE_EXISTING=$DRUPAL_SITE_DB_REPLACE_EXISTING
+    s6-dumpenv -- /var/run/s6/container_environment
+}

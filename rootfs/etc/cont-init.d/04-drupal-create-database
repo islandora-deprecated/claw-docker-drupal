@@ -1,0 +1,33 @@
+#!/usr/bin/execlineb -P
+# -*- mode: sh -*-
+# vi: set ft=sh:
+with-contenv
+multisubstitute
+{
+  import -i MYSQL_HOST
+  import -i MYSQL_HOST_PORT
+  import -i MYSQL_ROOT_PASSWORD
+  import -i DRUPAL_SITE_DB_NAME
+  import -i DRUPAL_SITE_DB_USER
+  import -i DRUPAL_SITE_DB_PASSWORD
+}
+foreground {
+    # Only create the database and user for Drupal if
+    # the database does not already exist.
+    if -nt {
+        redirfd -w 2 /dev/null
+        mysql
+        --user=root --password=${MYSQL_ROOT_PASSWORD}
+        --host=${MYSQL_HOST} --port=${MYSQL_HOST_PORT} --protocol=tcp
+        -e use ${DRUPAL_SITE_DB_NAME}
+    }
+    foreground {
+        redirfd -w 2 /dev/null
+        mysql
+        --user=root --password=${MYSQL_ROOT_PASSWORD}
+        --host=${MYSQL_HOST} --port=${MYSQL_HOST_PORT} --protocol=tcp
+        -e "CREATE USER '${DRUPAL_SITE_DB_USER}'@'%' IDENTIFIED BY '${DRUPAL_SITE_DB_PASSWORD}';
+            CREATE DATABASE ${DRUPAL_SITE_DB_NAME};
+            GRANT ALL ON ${DRUPAL_SITE_DB_NAME}.* TO '${DRUPAL_SITE_DB_USER}'@'%';"
+    }
+}

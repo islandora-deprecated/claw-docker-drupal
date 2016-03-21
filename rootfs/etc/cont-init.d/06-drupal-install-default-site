@@ -1,0 +1,76 @@
+#!/usr/bin/execlineb -P
+# -*- mode: sh -*-
+# vi: set ft=sh:
+with-contenv
+foreground {
+    multisubstitute
+    {
+        import -i MYSQL_HOST
+        import -i MYSQL_HOST_PORT
+        import -i MYSQL_ROOT_PASSWORD
+        import -i DRUPAL_SITE_DB_NAME
+    }
+    # Check if the Database is already populated with tables.
+    backtick -ni DRUPAL_SITE_DB_TABLES {
+        mysql
+        --user=root --password=${MYSQL_ROOT_PASSWORD}
+        --host=${MYSQL_HOST} --port=${MYSQL_HOST_PORT} --protocol=tcp
+        -Ne "SELECT COUNT(DISTINCT `table_name`)
+             FROM `information_schema`.`columns`
+             WHERE `table_schema` = '${DRUPAL_SITE_DB_NAME}'"
+    }
+    multisubstitute
+    {
+        import -i MYSQL_HOST
+        import -i MYSQL_HOST_PORT
+        import -i MYSQL_ROOT_PASSWORD
+        import -i DRUPAL_SITE_INSTALL_PROFILE
+        import -i DRUPAL_SITE_NAME
+        import -i DRUPAL_SITE_EMAIL
+        import -i DRUPAL_SITE_LOCALE
+        import -i DRUPAL_SITE_ACCOUNT_NAME
+        import -i DRUPAL_SITE_ACCOUNT_PASSWORD
+        import -i DRUPAL_SITE_ACCOUNT_EMAIL
+        import -i DRUPAL_SITE_DB_NAME
+        import -i DRUPAL_SITE_DB_USER
+        import -i DRUPAL_SITE_DB_PASSWORD
+        import -i DRUPAL_SITE_DB_REPLACE_EXISTING
+        import -i DRUPAL_SITE_DB_TABLES
+    }
+    # Only install if Database is not populated or if the variable
+    # $DRUPAL_SITE_DB_REPLACE_EXISTING has been explicity set
+    ifelse { s6-test $DRUPAL_SITE_DB_TABLES -eq 0 -o $DRUPAL_SITE_DB_REPLACE_EXISTING = "yes" } {
+        # Install the site, using the standard profile
+        # and don't send a e-mail notification.
+        cd /var/www/localhost/htdocs s6-setuidgid apache
+        drush -y si ${DRUPAL_SITE_INSTALL_PROFILE} install_configure_form.update_status_module='array(FALSE,FALSE)'
+        --sites-subdir=default
+        --site-name="${DRUPAL_SITE_NAME}"
+        --site-mail="${DRUPAL_SITE_EMAIL}"
+        --locale="${DRUPAL_SITE_LOCALE}"
+        --account-name="${DRUPAL_SITE_ACCOUNT_NAME}"
+        --account-pass="${DRUPAL_SITE_ACCOUNT_PASSWORD}"
+        --account-mail="${DRUPAL_SITE_ACCOUNT_EMAIL}"
+        --db-url="mysql://${DRUPAL_SITE_DB_USER}:${DRUPAL_SITE_DB_PASSWORD}@${MYSQL_HOST}:${MYSQL_HOST_PORT}/${DRUPAL_SITE_DB_NAME}"
+        --db-su="root" --db-su-pw="${MYSQL_ROOT_PASSWORD}"
+    }
+    multisubstitute
+    {
+        import -i MYSQL_HOST
+        import -i MYSQL_HOST_PORT
+        import -i DRUPAL_SITE_NAME
+        import -i DRUPAL_SITE_DB_NAME
+        import -i DRUPAL_SITE_DB_USER
+        import -i DRUPAL_SITE_DB_PASSWORD
+    }
+    # Create settings.php if we're using an exisiting database,
+    # we don't check the credentials to see if they match.
+    cd /var/www/localhost/htdocs s6-setuidgid apache
+    drush eval "
+    include DRUPAL_ROOT.'/includes/install.inc';
+    include DRUPAL_ROOT.'/includes/update.inc';
+    global $db_prefix;
+    $url = 'mysql://${DRUPAL_SITE_DB_USER}:${DRUPAL_SITE_DB_PASSWORD}@${MYSQL_HOST}:${MYSQL_HOST_PORT}/${DRUPAL_SITE_DB_NAME}';
+    $db['databases']['value'] = update_parse_db_url($url, $db_prefix);
+    drupal_rewrite_settings($db, $db_prefix);"
+} drush cc all

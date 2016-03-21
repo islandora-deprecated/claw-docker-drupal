@@ -1,0 +1,21 @@
+#!/usr/bin/execlineb -P
+# -*- mode: sh -*-
+# vi: set ft=sh:
+with-contenv
+multisubstitute
+{
+  import -i MYSQL_HOST
+  import -i MYSQL_HOST_PORT
+  import -i MYSQL_ROOT_PASSWORD
+}
+foreground {
+    # Wait for port to be open.
+    foreground { timeout -t 60 wait-for-open-port ${MYSQL_HOST} ${MYSQL_HOST_PORT} }
+    if {
+        # Validate the root credentials give us access.
+        mysqladmin -s
+        --user=root --password=$MYSQL_ROOT_PASSWORD
+        --host=$MYSQL_HOST --port=$MYSQL_HOST_PORT --protocol=tcp
+        ping
+    }
+}
