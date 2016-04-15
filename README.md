@@ -120,4 +120,4 @@ on Islandora.ca for more information.
 
 ### License
 
-[GPLv3](http://www.gnu.org/licenses/gpl-3.0.txt)
+[MIT](https://opensource.org/licenses/MIT)

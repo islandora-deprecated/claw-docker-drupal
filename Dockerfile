@@ -1,7 +1,7 @@
 FROM islandora-claw/base
 MAINTAINER Nigel Banks <nigel.g.banks@gmail.com>
 
-LABEL "License"="GPLv3" \
+LABEL "License"="MIT" \
       "Version"="0.0.1"
 
 EXPOSE 80
