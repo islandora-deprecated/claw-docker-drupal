@@ -1,9 +1,9 @@
 # Islandora CLAW: Drupal Docker Image
 
-[![Docker Stars](https://img.shields.io/docker/stars/islandora-claw/drupal.svg)](https://hub.docker.com/r/islandora-claw/drupal/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/islandora-claw/drupal.svg)](https://hub.docker.com/r/islandora-claw/drupal/)
-[![Image Size](https://img.shields.io/imagelayers/image-size/islandora-claw/drupal/latest.svg)](https://imagelayers.io/?images=islandora-claw/drupal:latest)
-[![Image Layers](https://img.shields.io/imagelayers/layers/islandora-claw/drupal/latest.svg)](https://imagelayers.io/?images=islandora-claw/drupal:latest)
+[![Docker Stars](https://img.shields.io/docker/stars/islandora/claw-drupal.svg)](https://hub.docker.com/r/islandora/claw-drupal/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/islandora/claw-drupal.svg)](https://hub.docker.com/r/islandora/claw-drupal/)
+[![Image Size](https://img.shields.io/imagelayers/image-size/islandora/claw-drupal/latest.svg)](https://imagelayers.io/?images=islandora/claw-drupal:latest)
+[![Image Layers](https://img.shields.io/imagelayers/layers/islandora/claw-drupal/latest.svg)](https://imagelayers.io/?images=islandora/claw-drupal:latest)
 
 ### Introduction
 
@@ -26,7 +26,7 @@ Based on the [Base Docker Image](https://github.com/Islandora-CLAW/docker-base).
 
 **Example:**
 ```bash
-docker build --build-arg "DRUPAL_VERSION=7.41" -t islandora-claw/drupal .
+docker build --build-arg "DRUPAL_VERSION=7.41" -t islandora/claw-drupal .
 ```
 
 ### Environment Variables
@@ -67,7 +67,7 @@ docker run --rm -ti -P  \
                     -e "MYSQL_ROOT_PASSWORD=your_super_secure_password" \
                     -e "DRUPAL_SITE_ACCOUNT_PASSWORD=your_super_secure_password" \
                     -e "DRUPAL_SITE_DB_PASSWORD=your_super_secure_password" \
-                    islandora-claw/drupal ash
+                    islandora/claw-drupal ash
 ```
 
 ### Commands
